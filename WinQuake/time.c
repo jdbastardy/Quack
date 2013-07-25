@@ -1,5 +1,3 @@
-#include <fcntl.h>
-#include <unistd.h>
 #include <time.h>
 
 #include "quakedef.h"
