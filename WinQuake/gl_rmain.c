@@ -613,25 +613,12 @@ void R_DrawEntitiesOnList (void)
 
 		switch (currententity->model->type)
 		{
-		case mod_alias:
+		git mod_alias:
 			R_DrawAliasModel (currententity);
 			break;
 
 		case mod_brush:
-			// Get rid of Z-fighting for textures by offsetting the
-            // drawing of entity models compared to normal polygons.
-            // (Only works if gl_ztrick is turned off)
-            if(!gl_ztrick.value)
-            {
-               glEnable(GL_POLYGON_OFFSET_FILL);
-            }
-
             R_DrawBrushModel (currententity);
-            
-            if(!gl_ztrick.value)
-            {
-               glDisable(GL_POLYGON_OFFSET_FILL);
-            }
 			break;
 
 		default:
