@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
+#include <io.h>
+
 #define NUM_SAFE_ARGVS  7
 
 static char     *largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
@@ -1692,6 +1694,9 @@ void COM_AddGameDirectory (char *dir)
 	searchpath_t    *search;
 	pack_t                  *pak;
 	char                    pakfile[MAX_OSPATH];
+	char dirstring[1024];
+	int  handle;
+	struct _finddata_t fileinfo;
 
 	strcpy (com_gamedir, dir);
 
@@ -1703,20 +1708,38 @@ void COM_AddGameDirectory (char *dir)
 	search->next = com_searchpaths;
 	com_searchpaths = search;
 
-//
-// add any pak files in the format pak0.pak pak1.pak, ...
-//
-	for (i=0 ; ; i++)
-	{
-		sprintf (pakfile, "%s/pak%i.pak", dir, i);
-		pak = COM_LoadPackFile (pakfile);
-		if (!pak)
-			break;
-		search = Hunk_Alloc (sizeof(searchpath_t));
-		search->pack = pak;
-		search->next = com_searchpaths;
-		com_searchpaths = search;               
-	}
+// add ANY pak file - MrG (biteme@telefragged.com)
+
+	sprintf (dirstring, "%s/*.pak", dir);
+	handle = _findfirst (dirstring, &fileinfo);
+      
+      	if (handle != -1)
+      	{
+		do
+        	{
+        		if (fileinfo.name[0] == '.')
+        			continue;
+		
+ 			sprintf(pakfile,"%s/%s", dir, fileinfo.name);
+ 			pak = COM_LoadPackFile (pakfile);
+
+  			if (!pak)
+  				break;
+  			
+  			search = Hunk_Alloc (sizeof(searchpath_t));
+			search->pack = pak;
+			search->next = com_searchpaths;
+			com_searchpaths = search;
+
+        	} while (_findnext( handle, &fileinfo ) != -1);
+        	
+        	_findclose (handle);
+
+      }
+
+// end of PAK code update
+
+
 
 //
 // add the contents of the parms.txt file to the end of the command line
