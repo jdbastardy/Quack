@@ -1074,7 +1074,10 @@ void R_Mirror (void)
 	glDepthFunc (GL_LEQUAL);
 
 	// blend on top
-	glEnable (GL_BLEND);
+	glEnable (GL_BLEND);   
+    //mirror fix - from QER
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    //mirror fix
 	glMatrixMode(GL_PROJECTION);
 	if (mirror_plane->normal[2])
 		glScalef (1,-1,1);
@@ -1092,6 +1095,9 @@ void R_Mirror (void)
 	cl.worldmodel->textures[mirrortexturenum]->texturechain = NULL;
 	glDisable (GL_BLEND);
 	glColor4f (1,1,1,1);
+    //mirror fix - from QER
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    //mirror fix
 }
 
 /*
