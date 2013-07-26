@@ -1,0 +1,34 @@
+Specifica i pattern per i file/cartelle che si vogliono far ignorare da git.
+
+Esempio:
+#ignore thumbnails created by windows
+Thumbs.db
+#Ignore files build by Visual Studio
+*.obj
+*.exe
+*.opensdf
+*.sdf
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+[Bb]in
+[Dd]ebug*/
+gl_debug/
+gl_release/
+*.lib
+*.sbr
+obj/
+[Rr]elease*/
+_ReSharper*/
