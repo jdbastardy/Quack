@@ -4,8 +4,10 @@
 //
 #define IDS_STRING1                     1
 #define IDI_ICON2                       1
+#ifdef HAVE_MFC
 #define IDD_DIALOG1                     108
 #define IDD_PROGRESS                    109
+#endif
 #define IDC_PROGRESS                    1000
 
 // Next default values for new objects

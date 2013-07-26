@@ -754,6 +754,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	if (!isDedicated)
 	{
+#ifdef HAVE_MFC
 		hwnd_dialog = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, NULL);
 
 		if (hwnd_dialog)
@@ -773,6 +774,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 			UpdateWindow (hwnd_dialog);
 			SetForegroundWindow (hwnd_dialog);
 		}
+#else
+    //TODO: use a more cross platform toolkit
+#endif
 	}
 
 // take the greater of all the available memory or half the total memory,
