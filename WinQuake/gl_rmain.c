@@ -613,7 +613,7 @@ void R_DrawEntitiesOnList (void)
 
 		switch (currententity->model->type)
 		{
-		git mod_alias:
+		mod_alias:
 			R_DrawAliasModel (currententity);
 			break;
 
