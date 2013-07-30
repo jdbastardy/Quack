@@ -513,7 +513,7 @@ void SV_WriteEntitiesToClient (edict_t	*clent, sizebuf_t *msg)
 // ignore ents without visible models
 			if (!ent->v.modelindex || !pr_strings[ent->v.model])
 				continue;
-
+                
 			for (i=0 ; i < ent->num_leafs ; i++)
 				if (pvs[ent->leafnums[i] >> 3] & (1 << (ent->leafnums[i]&7) ))
 					break;
