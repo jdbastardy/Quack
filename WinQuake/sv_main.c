@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 server_t		sv;
 server_static_t	svs;
 
+cvar_t  sv_cullentities = { "sv_cullentities", "1", false, true };
 cvar_t  sv_progs = {"sv_progs", "progs.dat" };
 
 char	localmodels[MAX_MODELS][5];			// inline model names for precache
@@ -49,6 +50,7 @@ void SV_Init (void)
 	extern	cvar_t	sv_idealpitchscale;
 	extern	cvar_t	sv_aim;
 
+    Cvar_RegisterVariable (&sv_cullentities)
 	Cvar_RegisterVariable (&sv_maxvelocity);
 	Cvar_RegisterVariable (&sv_gravity);
 	Cvar_RegisterVariable (&sv_friction);
@@ -421,6 +423,61 @@ byte *SV_FatPVS (vec3_t org)
 //=============================================================================
 
 
+extern trace_t SV_ClipMoveToEntity (edict_t *ent, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end);
+
+
+qboolean SV_InvisibleToClient(edict_t *viewer, edict_t *seen)
+{
+    int i;
+    trace_t tr;
+    vec3_t start;
+    vec3_t end;
+    
+    //Do not cull plants
+    if(seen->v.movetype == MOVETYPE_PUSH)
+    {
+        return false;
+    }
+    
+    if(sv_cullentities.value == 1) //1 Only players
+        if(strcmp(pr_strings + seen->v.classname, "player"))
+            return false;
+          
+    memset(&tr, 0, sizeof(tr));
+    tr.fraction = 1;        
+    
+    start[0] = viewer->v.origin[0];
+    start[1] = viewer->v.origin[1];
+    start[2] = viewer->v.origin[2] + viewer->v.view_ofs[2];
+    
+    end[0] = 0.5 * (seen->v.mins[0] + seen->v.maxs[0]);
+    end[1] = 0.5 * (seen->v.mins[1] + seen->v.maxs[1]);
+    end[2] = 0.5 * (seen->v.mins[2] + seen->v.maxs[2]);
+    
+    tr = SV_ClipMoveToEntity (sv.edicts, start, vec3_origin, vec3_origin, end);
+    if (tr.fraction == 1)// line hit the ent
+        return false;
+
+    //last attempt to eliminate any flaws...
+    if ((!strcmp(pr_strings + seen->v.classname, "player")) || (sv_cullentities.value > 1))
+    {
+        for (i = 0; i < 64; i++)
+        {
+            end[0] = seen->v.origin[0] + offsetrandom(seen->v.mins[0], seen->v.maxs[0]);
+            end[1] = seen->v.origin[1] + offsetrandom(seen->v.mins[1], seen->v.maxs[1]);
+            end[2] = seen->v.origin[2] + offsetrandom(seen->v.mins[2], seen->v.maxs[2]);
+
+            tr = SV_ClipMoveToEntity (sv.edicts, start, vec3_origin, vec3_origin, end);
+            if (tr.fraction == 1)// line hit the ent
+            {
+                DPrintf (va("found ent in %i hits\n", i));
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 /*
 =============
 SV_WriteEntitiesToClient
@@ -463,6 +520,9 @@ void SV_WriteEntitiesToClient (edict_t	*clent, sizebuf_t *msg)
 				
 			if (i == ent->num_leafs)
 				continue;		// not visible
+                
+            if(sv_cullentities.value && SV_InvisibleToClient(clent, ent))
+                continue;
 		}
 
 		if (msg->maxsize - msg->cursize < 16)
