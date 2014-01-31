@@ -50,7 +50,7 @@ void SV_Init (void)
 	extern	cvar_t	sv_idealpitchscale;
 	extern	cvar_t	sv_aim;
 
-    Cvar_RegisterVariable (&sv_cullentities)
+    Cvar_RegisterVariable (&sv_cullentities);
 	Cvar_RegisterVariable (&sv_maxvelocity);
 	Cvar_RegisterVariable (&sv_gravity);
 	Cvar_RegisterVariable (&sv_friction);
